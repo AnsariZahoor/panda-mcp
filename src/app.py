@@ -8,7 +8,7 @@ from fastmcp import FastMCP
 from starlette.responses import JSONResponse
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
-from fastmcp.server.auth.providers.auth0 import Auth0Provider
+# from fastmcp.server.auth.providers.auth0 import Auth0Provider
 
 from typing import Literal, Optional, List
 import json
@@ -31,9 +31,9 @@ from .metrics.orderflow import OrderflowMetric
 # - FASTMCP_SERVER_AUTH_AUTH0_CLIENT_SECRET
 # - FASTMCP_SERVER_AUTH_AUTH0_AUDIENCE
 # - FASTMCP_SERVER_AUTH_AUTH0_BASE_URL
-auth_provider = Auth0Provider()
+# auth_provider = Auth0Provider()
 
-# Initialize the FastMCP server with Auth0 authentication
+# Initialize the FastMCP server without authentication (for development)
 mcp = FastMCP(
     name="PandaMCP",
     instructions=(
@@ -44,8 +44,7 @@ mcp = FastMCP(
         "orderbook metrics (bid/ask ratios, CVD), and orderflow metrics (trade volume, deltas). "
         "Supports Binance, Bybit, and Hyperliquid exchanges (spot and futures). "
         "Use the tools to query trading pairs, market data, or access advanced panda liquidity, depth, and flow metrics."
-    ),
-    auth=auth_provider
+    )
 )
 
 # Configure CORS for browser-based clients
@@ -2542,18 +2541,19 @@ async def health_check(request):
 
 
 # Add a protected tool to test authentication
-@mcp.tool
-async def get_token_info() -> dict:
-    """Returns information about the Auth0 token."""
-    from fastmcp.server.dependencies import get_access_token
-
-    token = get_access_token()
-    print(token)
-
-    return {
-        "issuer": token.claims.get("iss"),
-        "audience": token.claims.get("aud"),
-        "scope": token.claims.get("scope")
-    }
+# Commented out since authentication is disabled
+# @mcp.tool
+# async def get_token_info() -> dict:
+#     """Returns information about the Auth0 token."""
+#     from fastmcp.server.dependencies import get_access_token
+#
+#     token = get_access_token()
+#     print(token)
+#
+#     return {
+#         "issuer": token.claims.get("iss"),
+#         "audience": token.claims.get("aud"),
+#         "scope": token.claims.get("scope")
+#     }
 
 app = mcp.http_app(middleware=middleware)
